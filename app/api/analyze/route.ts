@@ -70,10 +70,13 @@ export async function POST(req: NextRequest) {
     }
 
     const chatData = await chatRes.json()
-    const text: string = chatData.answer?.trim() ?? ''
+    const raw: string = chatData.answer?.trim() ?? ''
 
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    // 마크다운 코드블록 제거 후 JSON 추출
+    const stripped = raw.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '').trim()
+    const jsonMatch = stripped.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
+      console.error('[/api/analyze] 파싱 실패. 원본 응답:', raw)
       return NextResponse.json({ error: 'AI 응답 파싱 실패' }, { status: 500 })
     }
 
