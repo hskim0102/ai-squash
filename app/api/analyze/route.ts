@@ -4,6 +4,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { GoogleAIFileManager } from '@google/generative-ai/server'
 import { writeFileSync, unlinkSync } from 'fs'
 import path from 'path'
+import os from 'os'
 import { buildPrompt } from '@/lib/gemini'
 import type { AnalyzeApiResponse, MatchRecord } from '@/lib/types'
 
@@ -23,10 +24,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'API 키가 설정되지 않았습니다' }, { status: 500 })
     }
 
-    // 영상을 /tmp에 임시 저장
+    // 영상을 OS 임시 디렉토리에 저장 (Windows 호환)
     const bytes = await videoFile.arrayBuffer()
     const buffer = Buffer.from(bytes)
-    const tmpPath = path.join('/tmp', `squash-${Date.now()}.mp4`)
+    const tmpPath = path.join(os.tmpdir(), `squash-${Date.now()}.mp4`)
     writeFileSync(tmpPath, buffer)
 
     // Gemini File API로 업로드
