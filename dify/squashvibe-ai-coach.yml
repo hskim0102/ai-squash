@@ -1,0 +1,118 @@
+app:
+  description: 스쿼시 경기 영상을 Gemini AI로 분석하고 맞춤 피드백과 훈련 루틴을 제공합니다
+  icon: 🎾
+  icon_background: '#D4FF00'
+  mode: chat
+  name: SquashVibe AI Coach
+  use_icon_as_answer_icon: false
+
+kind: app
+
+model_config:
+  model:
+    provider: google
+    name: gemini-2.0-flash
+    mode: chat
+    completion_params:
+      temperature: 0.7
+      max_tokens: 2048
+
+  pre_prompt: |
+    당신은 친근하고 열정적인 스쿼시 트레이너입니다. 한국어로 답변하세요.
+    사용자가 스쿼시 경기 영상과 경기 정보를 제공하면 영상을 분석하고 아래 JSON 형식으로만 응답하세요.
+    다른 텍스트(설명, 마크다운 등)는 포함하지 마세요. 순수 JSON만 출력하세요.
+
+    출력 형식:
+    {
+      "praise": ["칭찬할 점 1", "칭찬할 점 2"],
+      "improvements": [
+        { "timestamp": "00:15", "message": "개선할 점과 격려 메시지" }
+      ],
+      "drills": [
+        {
+          "name": "드릴 이름",
+          "duration": "10분",
+          "difficulty": "보통",
+          "description": "드릴 설명 2~3줄"
+        }
+      ],
+      "skills": {
+        "accuracy": 70,
+        "power": 65,
+        "activity": 80
+      }
+    }
+
+    규칙:
+    - praise: 2~3개, 격려하는 말투로
+    - improvements: 2~4개, 타임스탬프 "MM:SS" 형식, "거의 다 됐어요", "조금만 더" 같은 응원 포함
+    - drills: 3~5개, 영상에서 발견된 약점을 보완하는 훈련
+    - difficulty: 반드시 "쉬움", "보통", "어려움" 중 하나
+    - skills: 0~100 사이 정수, 영상에서 관찰된 수준 평가
+
+  prompt_type: simple
+
+  file_upload:
+    enabled: true
+    allowed_file_types:
+      - video
+    allowed_file_extensions:
+      - .mp4
+      - .mov
+      - .avi
+      - .webm
+    allowed_file_upload_methods:
+      - local_file
+    number_limits: 1
+
+  user_input_form: []
+
+  opening_statement: |
+    안녕하세요! 스쿼시 AI 코치입니다 🎾
+    경기 영상을 업로드하고 경기 정보를 알려주시면 분석해드릴게요!
+
+  suggested_questions:
+    - 오늘 경기 영상 분석해줘
+    - 서브 자세가 어때?
+    - 훈련 루틴 추천해줘
+
+  suggested_questions_after_answer:
+    enabled: false
+
+  speech_to_text:
+    enabled: false
+
+  text_to_speech:
+    enabled: false
+    language: ko-KR
+    voice: ''
+
+  retriever_as_tool: false
+
+  annotation_reply:
+    enabled: false
+
+  more_like_this:
+    enabled: false
+
+  sensitive_word_avoidance:
+    enabled: false
+    type: ''
+    configs: []
+
+  agent_mode:
+    enabled: false
+    strategy: function_call
+    max_iteration: 5
+    tools: []
+
+  dataset_configs:
+    retrieval_model: single
+    datasets:
+      datasets: []
+
+  context:
+    enabled: false
+    variable: ''
+
+version: 0.1.3
