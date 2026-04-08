@@ -1,12 +1,9 @@
 // app/api/analyze/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { GoogleGenerativeAI } from '@google/generative-ai'
-import { GoogleAIFileManager } from '@google/generative-ai/server'
-import { writeFileSync, unlinkSync } from 'fs'
-import path from 'path'
-import os from 'os'
 import { buildPrompt } from '@/lib/gemini'
 import type { AnalyzeApiResponse, MatchRecord } from '@/lib/types'
+
+const DIFY_BASE_URL = process.env.DIFY_BASE_URL ?? 'https://api.dify.ai/v1'
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,52 +16,62 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '영상 파일이 필요합니다' }, { status: 400 })
     }
 
-    const apiKey = process.env.GEMINI_API_KEY
+    const apiKey = process.env.DIFY_API_KEY
     if (!apiKey) {
       return NextResponse.json({ error: 'API 키가 설정되지 않았습니다' }, { status: 500 })
     }
 
-    // 영상을 OS 임시 디렉토리에 저장 (Windows 호환)
-    const bytes = await videoFile.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const tmpPath = path.join(os.tmpdir(), `squash-${Date.now()}.mp4`)
-    writeFileSync(tmpPath, buffer)
+    // 1. Dify 파일 업로드
+    const uploadFormData = new FormData()
+    uploadFormData.append('file', videoFile)
+    uploadFormData.append('user', 'squashvibe-user')
 
-    // Gemini File API로 업로드
-    const fileManager = new GoogleAIFileManager(apiKey)
-    const uploadResult = await fileManager.uploadFile(tmpPath, {
-      mimeType: videoFile.type || 'video/mp4',
-      displayName: 'squash-analysis',
+    const uploadRes = await fetch(`${DIFY_BASE_URL}/files/upload`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}` },
+      body: uploadFormData,
     })
 
-    // 파일 처리 대기
-    let geminiFile = await fileManager.getFile(uploadResult.file.name)
-    let attempts = 0
-    while (geminiFile.state === 'PROCESSING' && attempts < 30) {
-      await new Promise((r) => setTimeout(r, 2000))
-      geminiFile = await fileManager.getFile(uploadResult.file.name)
-      attempts++
+    if (!uploadRes.ok) {
+      const err = await uploadRes.json()
+      return NextResponse.json({ error: `파일 업로드 실패: ${err.message ?? uploadRes.statusText}` }, { status: 500 })
     }
 
-    if (geminiFile.state === 'FAILED') {
-      unlinkSync(tmpPath)
-      return NextResponse.json({ error: '영상 처리에 실패했습니다' }, { status: 500 })
-    }
+    const uploadData = await uploadRes.json()
+    const uploadFileId: string = uploadData.id
 
-    // 분석 요청
-    const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+    // 2. Dify 채팅으로 분석 요청
     const prompt = buildPrompt(matchRecord)
 
-    const result = await model.generateContent([
-      { fileData: { mimeType: geminiFile.mimeType, fileUri: geminiFile.uri } },
-      { text: prompt },
-    ])
+    const chatRes = await fetch(`${DIFY_BASE_URL}/chat-messages`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        inputs: {},
+        query: prompt,
+        files: [
+          {
+            type: 'video',
+            transfer_method: 'local_file',
+            upload_file_id: uploadFileId,
+          },
+        ],
+        response_mode: 'blocking',
+        user: 'squashvibe-user',
+      }),
+    })
 
-    // 임시 파일 삭제
-    unlinkSync(tmpPath)
+    if (!chatRes.ok) {
+      const err = await chatRes.json()
+      return NextResponse.json({ error: `분석 요청 실패: ${err.message ?? chatRes.statusText}` }, { status: 500 })
+    }
 
-    const text = result.response.text().trim()
+    const chatData = await chatRes.json()
+    const text: string = chatData.answer?.trim() ?? ''
+
     const jsonMatch = text.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
       return NextResponse.json({ error: 'AI 응답 파싱 실패' }, { status: 500 })
