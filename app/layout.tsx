@@ -19,7 +19,7 @@ export default function RootLayout({
     <html lang="ko" className="dark">
       <body className={`${inter.className} bg-background`}>
         <Sidebar />
-        <main className="ml-56 min-h-screen p-8">
+        <main className="md:ml-56 min-h-screen pt-14 md:pt-0 p-4 md:p-8">
           {children}
         </main>
       </body>

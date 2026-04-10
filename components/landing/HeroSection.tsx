@@ -21,7 +21,7 @@ export function HeroSection() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
-        className="text-5xl md:text-7xl font-bold leading-tight mb-6"
+        className="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight mb-6"
       >
         당신의 랠리를
         <br />
@@ -33,10 +33,10 @@ export function HeroSection() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="text-foreground/50 text-lg mb-10 max-w-md"
+        className="text-foreground/50 text-base md:text-lg mb-10 max-w-sm md:max-w-md px-2"
       >
         경기 영상을 업로드하면 AI가 자세를 분석하고
-        <br />오늘 당장 연습할 훈련 루틴을 알려드립니다
+        오늘 당장 연습할 훈련 루틴을 알려드립니다
       </motion.p>
 
       {/* CTA 버튼 */}
@@ -49,7 +49,7 @@ export function HeroSection() {
           <motion.button
             whileHover={{ scale: 1.05, boxShadow: '0 0 32px #D4FF0080' }}
             whileTap={{ scale: 0.97 }}
-            className="bg-accent text-accent-foreground font-bold px-10 py-4 rounded-full text-lg transition-all"
+            className="bg-accent text-accent-foreground font-bold px-8 md:px-10 py-3 md:py-4 rounded-full text-base md:text-lg transition-all"
           >
             영상 분석 시작하기 →
           </motion.button>

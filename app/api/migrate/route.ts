@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, migrated: 0 })
   }
 
-  await prisma.analysis.createMany({
+  const result = await prisma.analysis.createMany({
     data: analyses.map((a) => ({
       id: a.id,
       deviceId,
@@ -27,5 +27,5 @@ export async function POST(req: NextRequest) {
     skipDuplicates: true,
   })
 
-  return NextResponse.json({ ok: true, migrated: analyses.length })
+  return NextResponse.json({ ok: true, migrated: result.count })
 }

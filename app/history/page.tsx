@@ -13,9 +13,9 @@ export default function HistoryPage() {
   }, [])
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">기록실</h1>
+        <h1 className="text-xl md:text-2xl font-bold">기록실</h1>
         <p className="text-foreground/40 text-sm mt-1">나의 성장 히스토리</p>
       </div>
 
@@ -28,18 +28,18 @@ export default function HistoryPage() {
       ) : (
         <ul className="space-y-3">
           {analyses.map((a) => (
-            <li key={a.id} className="glass-card p-5 flex items-center justify-between">
-              <div className="space-y-1">
-                <p className="text-sm text-foreground/60">
+            <li key={a.id} className="glass-card p-4 md:p-5 flex items-start md:items-center justify-between gap-3">
+              <div className="space-y-1 min-w-0">
+                <p className="text-xs md:text-sm text-foreground/60">
                   {new Date(a.createdAt).toLocaleDateString('ko-KR', {
                     year: 'numeric', month: 'long', day: 'numeric'
                   })}
                 </p>
-                <p className="text-foreground/80 text-sm">
+                <p className="text-foreground/80 text-sm truncate">
                   {a.praise[0] ?? '분석 완료'}
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 flex items-center gap-3">
                 {a.matchRecord.result && (
                   <span className={`text-xs px-3 py-1 rounded-full font-medium
                     ${a.matchRecord.result === 'win'

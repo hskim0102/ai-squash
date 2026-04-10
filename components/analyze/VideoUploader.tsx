@@ -41,7 +41,7 @@ export function VideoUploader({ onFileSelect }: VideoUploaderProps) {
         onDragLeave={() => setIsDragging(false)}
         onDrop={onDrop}
         animate={isDragging ? { scale: 1.02 } : { scale: 1 }}
-        className={`glass-card border-2 border-dashed cursor-pointer transition-colors p-10 text-center
+        className={`glass-card border-2 border-dashed cursor-pointer transition-colors p-6 md:p-10 text-center
           ${isDragging ? 'border-accent bg-accent/5' : 'border-glass-border hover:border-accent/40'}`}
       >
         <input
@@ -62,7 +62,7 @@ export function VideoUploader({ onFileSelect }: VideoUploaderProps) {
             >
               <video
                 src={preview}
-                className="w-48 h-28 object-cover rounded-lg border border-glass-border"
+                className="w-full max-w-xs h-28 md:h-36 object-cover rounded-lg border border-glass-border"
                 muted
               />
               <p className="text-foreground/70 text-sm truncate max-w-xs">{fileName}</p>

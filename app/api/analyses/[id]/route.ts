@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import type { AnalysisResult, DrillItem } from '@/lib/types'
+import type { AnalysisResult } from '@/lib/types'
 
 export async function GET(
   req: NextRequest,
@@ -41,7 +41,11 @@ export async function PATCH(
     return NextResponse.json({ error: 'device_id 없음' }, { status: 400 })
   }
 
-  const { drills }: { drills: DrillItem[] } = await req.json()
+  const body = await req.json()
+  const { drills } = body
+  if (!Array.isArray(drills)) {
+    return NextResponse.json({ error: '드릴 데이터가 올바르지 않습니다' }, { status: 400 })
+  }
 
   const existing = await prisma.analysis.findFirst({
     where: { id: params.id, deviceId },

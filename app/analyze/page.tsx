@@ -86,9 +86,9 @@ export default function AnalyzePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-6 md:space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">영상 분석하기</h1>
+        <h1 className="text-xl md:text-2xl font-bold">영상 분석하기</h1>
         <p className="text-foreground/40 text-sm mt-1">경기 영상을 업로드하면 AI가 분석해드립니다</p>
       </div>
 
@@ -115,7 +115,7 @@ export default function AnalyzePage() {
               whileTap={videoFile ? { scale: 0.98 } : {}}
               onClick={handleAnalyze}
               disabled={!videoFile}
-              className={`w-full py-4 rounded-xl font-bold text-lg transition-all
+              className={`w-full py-3 md:py-4 rounded-xl font-bold text-base md:text-lg transition-all
                 ${videoFile
                   ? 'bg-accent text-accent-foreground'
                   : 'bg-glass text-foreground/30 cursor-not-allowed border border-glass-border'

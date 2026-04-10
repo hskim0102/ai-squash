@@ -27,7 +27,7 @@ export function MatchRecordForm({ onChange }: MatchRecordFormProps) {
   }
 
   return (
-    <div className="glass-card p-6 space-y-6">
+    <div className="glass-card p-4 md:p-6 space-y-5 md:space-y-6">
       <h3 className="text-sm font-semibold text-foreground/60 uppercase tracking-wider">
         경기 기록 <span className="text-foreground/30">(선택)</span>
       </h3>
