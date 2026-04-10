@@ -8,8 +8,13 @@ import os from 'os'
 import { buildPrompt } from '@/lib/gemini'
 import type { AnalyzeApiResponse, MatchRecord } from '@/lib/types'
 
+
+
 export async function POST(req: NextRequest) {
+
+
   try {
+
     const formData = await req.formData()
     const videoFile = formData.get('video') as File
     const matchRecordRaw = formData.get('matchRecord') as string
@@ -53,7 +58,11 @@ export async function POST(req: NextRequest) {
 
     // 분석 요청
     const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-flash-lite-latest' })
+    //const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    //const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+    //const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    //const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = buildPrompt(matchRecord)
 
     const result = await model.generateContent([
