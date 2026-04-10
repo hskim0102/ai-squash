@@ -36,3 +36,6 @@ yarn-error.log*
 next-env.d.ts
 
 /lib/generated/prisma
+
+# 업로드된 영상 파일
+public/uploads/
