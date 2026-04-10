@@ -1,0 +1,21 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Analysis {
+  id           String   @id @default(uuid())
+  deviceId     String
+  createdAt    DateTime @default(now())
+  matchRecord  Json
+  praise       Json
+  improvements Json
+  drills       Json
+  skills       Json
+  videoPath    String?
+
+  @@index([deviceId, createdAt])
+}
