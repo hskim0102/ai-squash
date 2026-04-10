@@ -4,12 +4,12 @@ export type MatchResult = 'win' | 'lose' | null
 
 export interface MatchRecord {
   result: MatchResult
-  condition: number        // 1~5
+  condition: number
   memo: string
 }
 
 export interface ImprovementItem {
-  timestamp: string        // "00:15" 형식
+  timestamp: string
   message: string
 }
 
@@ -17,26 +17,27 @@ export type DrillDifficulty = '쉬움' | '보통' | '어려움'
 
 export interface DrillItem {
   name: string
-  duration: string         // "10분" 형식
+  duration: string
   difficulty: DrillDifficulty
   description: string
   completed: boolean
 }
 
 export interface SkillScores {
-  accuracy: number         // 0~100
-  power: number            // 0~100
-  activity: number         // 0~100
+  accuracy: number
+  power: number
+  activity: number
 }
 
 export interface AnalysisResult {
-  id: string               // crypto.randomUUID()
-  createdAt: string        // ISO 날짜 문자열
+  id: string
+  createdAt: string
   matchRecord: MatchRecord
   praise: string[]
   improvements: ImprovementItem[]
   drills: DrillItem[]
   skills: SkillScores
+  videoPath?: string          // /uploads/{deviceId}/{id}.ext
 }
 
 export interface AnalyzeRequestBody {
@@ -46,8 +47,10 @@ export interface AnalyzeRequestBody {
 }
 
 export interface AnalyzeApiResponse {
+  id: string                  // 서버에서 생성한 DB ID
   praise: string[]
   improvements: ImprovementItem[]
   drills: Omit<DrillItem, 'completed'>[]
   skills: SkillScores
+  videoPath?: string
 }
