@@ -21,11 +21,11 @@ export async function GET(
   const analysis: AnalysisResult = {
     id: row.id,
     createdAt: row.createdAt.toISOString(),
-    matchRecord: row.matchRecord as AnalysisResult['matchRecord'],
-    praise: row.praise as string[],
-    improvements: row.improvements as AnalysisResult['improvements'],
-    drills: row.drills as AnalysisResult['drills'],
-    skills: row.skills as AnalysisResult['skills'],
+    matchRecord: row.matchRecord as unknown as AnalysisResult['matchRecord'],
+    praise: row.praise as unknown as string[],
+    improvements: row.improvements as unknown as AnalysisResult['improvements'],
+    drills: row.drills as unknown as AnalysisResult['drills'],
+    skills: row.skills as unknown as AnalysisResult['skills'],
     videoPath: row.videoPath ?? undefined,
   }
 
