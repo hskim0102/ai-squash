@@ -7,15 +7,27 @@ datasource db {
 }
 
 model Analysis {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   deviceId     String
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
   matchRecord  Json
   praise       Json
   improvements Json
   drills       Json
   skills       Json
   videoPath    String?
+  comments     Comment[]
 
   @@index([deviceId, createdAt])
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  analysisId String
+  author     String   @default("응원자") @db.VarChar(50)
+  content    String   @db.VarChar(500)
+  createdAt  DateTime @default(now())
+  analysis   Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([analysisId, createdAt])
 }

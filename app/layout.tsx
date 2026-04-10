@@ -7,8 +7,8 @@ import { ClientProvider } from '@/components/ClientProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'SquashVibe AI',
-  description: '당신의 랠리를 데이터로 증명하세요',
+  title: '창연쌤의 스쿼시 교실',
+  description: '창연쌤의 스쿼시 교실 — AI가 분석하는 나만의 코치',
 }
 
 export default function RootLayout({
@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ko" className="dark">
+    <html lang="ko">
       <body className={`${inter.className} bg-background`}>
         <ClientProvider>
           <Sidebar />
