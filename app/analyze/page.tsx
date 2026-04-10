@@ -1,4 +1,3 @@
-// app/analyze/page.tsx
 'use client'
 
 import { useState, useRef } from 'react'
@@ -8,7 +7,8 @@ import { AnalysisLoader } from '@/components/analyze/AnalysisLoader'
 import { VideoPlayer } from '@/components/analyze/VideoPlayer'
 import { FeedbackCard } from '@/components/analyze/FeedbackCard'
 import { DrillCarousel } from '@/components/analyze/DrillCarousel'
-import { saveAnalysis } from '@/lib/storage'
+import { updateDrills } from '@/lib/storage'
+import { getDeviceId } from '@/lib/deviceId'
 import type { MatchRecord, AnalysisResult, AnalyzeApiResponse, DrillItem } from '@/lib/types'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -37,7 +37,6 @@ export default function AnalyzePage() {
     setState('loading')
     setError(null)
 
-    // 로딩 메시지 순환
     loaderInterval.current = setInterval(() => {
       setLoaderMsg((m) => m + 1)
     }, 3000)
@@ -46,6 +45,7 @@ export default function AnalyzePage() {
       const formData = new FormData()
       formData.append('video', videoFile)
       formData.append('matchRecord', JSON.stringify(matchRecord))
+      formData.append('deviceId', getDeviceId())
 
       const res = await fetch('/api/analyze', {
         method: 'POST',
@@ -59,16 +59,16 @@ export default function AnalyzePage() {
 
       const data: AnalyzeApiResponse = await res.json()
       const analysisResult: AnalysisResult = {
-        id: crypto.randomUUID(),
+        id: data.id,
         createdAt: new Date().toISOString(),
         matchRecord,
         praise: data.praise,
         improvements: data.improvements,
         drills: data.drills.map((d) => ({ ...d, completed: false })),
         skills: data.skills,
+        videoPath: data.videoPath,
       }
 
-      saveAnalysis(analysisResult)
       setResult(analysisResult)
       setState('result')
     } catch (err) {
@@ -79,10 +79,10 @@ export default function AnalyzePage() {
     }
   }
 
-  function handleSaveDrills(drills: DrillItem[]) {
+  async function handleSaveDrills(drills: DrillItem[]) {
     if (!result) return
-    const updated = { ...result, drills }
-    saveAnalysis(updated)
+    await updateDrills(result.id, drills)
+    setResult((prev) => (prev ? { ...prev, drills } : null))
   }
 
   return (
@@ -132,27 +132,20 @@ export default function AnalyzePage() {
           </motion.div>
         )}
 
-        {state === 'result' && result && videoUrl && (
+        {state === 'result' && result && (
           <motion.div
             key="result"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            {/* 비디오 플레이어 */}
-            <VideoPlayer src={videoUrl} seekTo={seekTo} />
-
-            {/* 피드백 카드 */}
+            <VideoPlayer src={videoUrl ?? result.videoPath ?? ''} seekTo={seekTo} />
             <FeedbackCard
               praise={result.praise}
               improvements={result.improvements}
               onSeek={(s) => setSeekTo(s)}
             />
-
-            {/* 훈련 루틴 */}
             <DrillCarousel drills={result.drills} onSave={handleSaveDrills} />
-
-            {/* 다시 분석 */}
             <button
               onClick={() => { setState('upload'); setResult(null); setVideoFile(null); setVideoUrl(null) }}
               className="text-sm text-foreground/40 hover:text-foreground/70 underline"
