@@ -9,7 +9,7 @@ export default function HistoryPage() {
   const [analyses, setAnalyses] = useState<AnalysisResult[]>([])
 
   useEffect(() => {
-    setAnalyses(getAnalyses())
+    getAnalyses().then(setAnalyses)
   }, [])
 
   return (
