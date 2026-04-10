@@ -1,30 +1,35 @@
-// lib/storage.ts
-import type { AnalysisResult } from './types'
+import { getDeviceId } from './deviceId'
+import type { AnalysisResult, DrillItem } from './types'
 
-const STORAGE_KEY = 'squashvibe_analyses'
-
-// 동일 id가 있으면 교체(upsert), 없으면 앞에 추가
-export function saveAnalysis(result: AnalysisResult): void {
-  const existing = getAnalyses()
-  const filtered = existing.filter((a) => a.id !== result.id)
-  const updated = [result, ...filtered]
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+function headers() {
+  return { 'x-device-id': getDeviceId() }
 }
 
-export function getAnalyses(): AnalysisResult[] {
-  if (typeof window === 'undefined') return []
-  const raw = localStorage.getItem(STORAGE_KEY)
-  if (!raw) return []
+export async function getAnalyses(): Promise<AnalysisResult[]> {
   try {
-    const parsed = JSON.parse(raw) as AnalysisResult[]
-    return parsed.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
+    const res = await fetch('/api/analyses', { headers: headers() })
+    if (!res.ok) return []
+    const data = await res.json()
+    return data.analyses as AnalysisResult[]
   } catch {
     return []
   }
 }
 
-export function clearAnalyses(): void {
-  localStorage.removeItem(STORAGE_KEY)
+export async function getAnalysis(id: string): Promise<AnalysisResult | null> {
+  try {
+    const res = await fetch(`/api/analyses/${id}`, { headers: headers() })
+    if (!res.ok) return null
+    return res.json()
+  } catch {
+    return null
+  }
+}
+
+export async function updateDrills(id: string, drills: DrillItem[]): Promise<void> {
+  await fetch(`/api/analyses/${id}`, {
+    method: 'PATCH',
+    headers: { ...headers(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ drills }),
+  })
 }
